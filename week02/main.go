@@ -21,6 +21,7 @@ func main() {
 		//读取当前系统的环境变量中的 VERSION 配置，并写入 response header
 		res.Header().Set("VERSION", os.Getenv("VERSION"))
 		//Server 端记录访问日志包括客户端 IP，HTTP 返回码，输出到 server 端的标准输出
+		res.Write([]byte("hello,index"))
 
 		log.Printf("客户端IP:%s,HTTT返回码:%d", req.Host, http.StatusOK)
 	}
