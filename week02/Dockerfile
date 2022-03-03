@@ -2,7 +2,7 @@ FROM golang:alpine AS build
 WORKDIR /app
 COPY go.mod /app
 COPY main.go /app
-RUN CGO_ENABLED=0 go build .
+RUN CGO_ENABLED=0 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build .
 
 FROM busybox
 WORKDIR /bin
