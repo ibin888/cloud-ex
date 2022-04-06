@@ -1,0 +1,79 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: http01-deployment
+  labels:
+    app: http01
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: http01
+  # 优雅关闭
+
+  template:
+    metadata:
+      labels:
+        app: http01
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: http01
+          image: httptest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: liveness-port
+              containerPort: 80
+
+          # 配置，还是用环境变量吧
+          env:
+            - name: httpPort
+              valueFrom:
+                configMapKeyRef:
+                  name: http-port-config
+                  key: httpport
+          # 资源限制和Qos
+          resources:
+            limits:
+              cpu: 700m
+              memory: 500Mi
+            requests:
+              cpu: 100m
+              memory: 50Mi
+          # 优雅启动
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: liveness-port
+            failureThreshold: 1
+            periodSeconds: 5
+          # 探活
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: liveness-port
+            failureThreshold: 1
+            periodSeconds: 5
+          # 配置
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/config
+
+      volumes:
+        - name: config-volume
+          configMap:
+            name: http-port-config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: http01-svc
+spec:
+  selector:
+    app: http01
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
