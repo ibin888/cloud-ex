@@ -25,7 +25,7 @@ spec:
 * 日常运维需求，日志等级 ： 代码中用klog
 * 配置和代码分离，这个程序应该就一个端口配置吧。用`configmap`，然后用volume或者env来引入
 
-###操作
+### 操作
 ```azure
 make build .
 docker tag http01 avaisa/http01
@@ -50,7 +50,7 @@ kubect create  -f dp.yaml
   * ingress 自带tls 证书 见ingress.yaml
   * 使用cert-manager 见ingress02.yaml
 
-###操作
+### 操作
 ```azure
 kubect create  -f ca.yaml
 kubectl create -f ingress02.yaml 或者kubectl create -f ingress.yaml
