@@ -1,0 +1,32 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: httpistio
+spec:
+  gateways:
+    - httpistio
+  hosts:
+    - http.mgumm.com
+  http:
+    - match:
+        - port: 80
+      route:
+        - destination:
+            host: httpsvc.httpistio.svc.cluster.local
+            port:
+              number: 80
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: httpistio
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - hosts:
+        - http.mgumm.com
+      port:
+        name: http-simple
+        number: 80
+        protocol: HTTP

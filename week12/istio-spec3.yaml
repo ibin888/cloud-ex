@@ -1,0 +1,56 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: httpistio
+spec:
+  gateways:
+    - httpistio
+  hosts:
+    - http.mgumm.com
+  http:
+    - match:
+        - port: 443
+      route:
+        - destination:
+            host: httpsvc.httpistio.svc.cluster.local
+            port:
+              number: 80
+    - match:
+      - uri:
+          exact: "/http"
+      rewrite:
+        uri: "/"
+      route:
+        - destination:
+            host: httpsvc.httpistio.svc.cluster.local
+            port:
+              number: 80
+    - match:
+      - uri:
+          prefix: "/nginx"
+      rewrite:
+        uri: "/"
+      route:
+        - destination:
+            host: nginx.httpistio.svc.cluster.local
+            port:
+              number: 80
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: httpistio
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - hosts:
+        - http.mgumm.com
+      port:
+        name: http-simple
+        number: 443
+        protocol: HTTPS
+      tls:
+        mode: SIMPLE
+        credentialName: mgumm-cert
+
